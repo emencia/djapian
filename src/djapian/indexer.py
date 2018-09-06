@@ -204,6 +204,9 @@ class Indexer(object):
 
     # Public Indexer interface
 
+    def get_all_documents(self, **kwargs):
+        return self._model.objects.all()
+
     def update(self, documents=None, after_index=None, per_page=10000, commit_each=False):
         """
         Update the database with the documents.
@@ -224,7 +227,7 @@ class Indexer(object):
 
         # If doesnt have any document at all
         if documents is None:
-            update_queue = self._model.objects.all()
+            update_queue = self.get_all_documents()
         else:
             update_queue = documents
 
