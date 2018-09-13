@@ -1,15 +1,12 @@
 import datetime
-import os
 
 from django.db import models
 from django.utils.itercompat import is_iterable
-from djapian.signals import post_save, pre_delete
 from django.conf import settings
 from django.utils.encoding import smart_str
 
 from djapian import decider
 from djapian.database import CompositeDatabase
-from djapian.resultset import ResultSet
 from djapian.utils.paging import paginate
 from djapian.utils.commiter import Commiter
 from djapian.utils.decorators import reopen_if_modified
@@ -166,6 +163,7 @@ class Indexer(object):
             else:
                 raise ValueError("Cannot create alias for tag `%s` that doesn't exist" % tag)
 
+        from djapian.signals import post_save, pre_delete
         models.signals.post_save.connect(post_save, sender=self._model)
         models.signals.pre_delete.connect(pre_delete, sender=self._model)
 
@@ -291,6 +289,7 @@ class Indexer(object):
                 raise
 
     def search(self, query):
+        from djapian.resultset import ResultSet
         return ResultSet(self, query)
 
     def delete(self, obj, database=None):
@@ -301,7 +300,7 @@ class Indexer(object):
             if database is None:
                 database = self._db.open(write=True)
             database.delete_document(self._create_uid(obj))
-        except (IOError, RuntimeError, xapian.DocNotFoundError), e:
+        except (IOError, RuntimeError, xapian.DocNotFoundError) as e:
             pass
 
     def document_count(self):
