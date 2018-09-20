@@ -51,7 +51,7 @@ class Change(models.Model):
     objects = ChangeManager()
 
     def __unicode__(self):
-        return u'%s %s#%s on %s' % (
+        return '%s %s#%s on %s' % (
             self.action,
             self.content_type,
             self.object_id,

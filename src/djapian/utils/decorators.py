@@ -3,7 +3,7 @@ import xapian
 def retry_if_except(errors, num_retry=4, cleanup_callback=None):
     def _wrap(func):
         def _inner(*args, **kwargs):
-            for n in reversed(range(num_retry)):
+            for n in reversed(list(range(num_retry))):
                 try:
                     return func(*args, **kwargs)
                 except errors:

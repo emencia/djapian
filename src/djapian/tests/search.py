@@ -25,7 +25,7 @@ class IndexerSearchTextTest(BaseIndexerTest, BaseTestCase):
         self.assertEqual(result, expected)
 
     def test_score(self):
-        self.assert_(self.result[0].percent in (99, 100))
+        self.assertTrue(self.result[0].percent in (99, 100))
 
     def test_hit_fields(self):
         hit = self.result[0]
@@ -41,7 +41,7 @@ class IndexerSearchTextTest(BaseIndexerTest, BaseTestCase):
         self.assertEqual(result[0].instance.author.name, 'Alex')
 
         result = self.result.prefetch(select_related=True)
-        self.assert_(hasattr(result[0].instance, '_author_cache'))
+        self.assertTrue(hasattr(result[0].instance, '_author_cache'))
         self.assertEqual(result[0].instance.author.name, 'Alex')
 
     def test_prefetch_deleted(self):

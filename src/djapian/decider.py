@@ -5,6 +5,7 @@ import xapian
 
 from django.db import models
 from django.utils.functional import curry
+from functools import reduce
 
 class X(models.Q):
     pass
@@ -97,7 +98,7 @@ class CompositeDecider(xapian.MatchDecider):
         convert = self.get_tag(self._values_map[field]).convert
 
         if isinstance(value, (list, tuple)):
-            value = map(convert, value)
+            value = list(map(convert, value))
         else:
             value = convert(value)
 

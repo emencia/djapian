@@ -9,7 +9,7 @@ from djapian.tests.utils import BaseTestCase, BaseIndexerTest, Entry, Person, Mu
 
 class IndexerUpdateTest(BaseIndexerTest, BaseTestCase):
     def test_database_exists(self):
-        self.assert_(os.path.exists(Entry.indexer._db._path))
+        self.assertTrue(os.path.exists(Entry.indexer._db._path))
 
     def test_document_count(self):
         self.assertEqual(Entry.indexer.document_count(), 3)

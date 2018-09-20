@@ -1,7 +1,8 @@
 import xapian
 import operator
 from copy import deepcopy
-from itertools import imap
+from functools import reduce
+
 
 from django.apps import apps
 from django.utils.encoding import force_unicode
@@ -124,10 +125,7 @@ class ResultSet(object):
         if raw_fields:
             fields = fields & reduce(
                 operator.and_,
-                map(
-                    lambda value: decider.X(**{value[0]: value[1]}),
-                    raw_fields.iteritems()
-                )
+                [decider.X(**{value[0]: value[1]}) for value in iter(raw_fields.items())]
             )
         self._check_fields(fields)
         return fields
@@ -180,7 +178,7 @@ class ResultSet(object):
         for hit in self._resultset_cache:
             model_map.setdefault(hit.model, []).append(hit)
 
-        for model, hits in model_map.iteritems():
+        for model, hits in model_map.items():
             pks = [hit.pk for hit in hits]
 
             instances = model._default_manager.all()
@@ -197,7 +195,7 @@ class ResultSet(object):
                     hit.instance = instance
 
         # filter results which may have become invalid during the search
-        self._resultset_cache = filter(lambda hit: hit._instance, self._resultset_cache)
+        self._resultset_cache = [hit for hit in self._resultset_cache if hit._instance]
 
     def _get_mset(self):
         if self._mset is None:
@@ -261,7 +259,7 @@ class ResultSet(object):
     def __iter__(self):
         self._fetch_results()
         if self._instances:
-            return imap(lambda hit: hit.instance, self._resultset_cache)
+            return map(lambda hit: hit.instance, self._resultset_cache)
         return iter(self._resultset_cache)
 
     def __len__(self):
@@ -269,7 +267,7 @@ class ResultSet(object):
         return len(self._resultset_cache)
 
     def __getitem__(self, k):
-        if not isinstance(k, (slice, int, long)):
+        if not isinstance(k, (slice, int)):
             raise TypeError
         if not ((not isinstance(k, slice) and (k >= 0))
                 or (isinstance(k, slice) and (k.start is None or k.start >= 0)
@@ -291,10 +289,10 @@ class ResultSet(object):
 
                 return self._clone(offset=start, limit=limit)
             else:
-                return iter(self._clone(offset=k, limit=1)).next()
+                return next(iter(self._clone(offset=k, limit=1)))
 
     def __unicode__(self):
-        return u"<ResultSet: query=%s>" % force_unicode(self._query_str)
+        return "<ResultSet: query=%s>" % force_unicode(self._query_str)
 
 class Hit(object):
     def __init__(self, pk, model, percent, rank, weight, tags, collapse_count, collapse_key):

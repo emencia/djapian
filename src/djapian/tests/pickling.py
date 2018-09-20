@@ -1,4 +1,4 @@
-import cPickle as pickle
+import pickle as pickle
 
 from djapian.tests.utils import BaseTestCase, BaseIndexerTest, Entry
 

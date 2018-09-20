@@ -13,9 +13,10 @@ from djapian.utils.decorators import reopen_if_modified
 from djapian.utils import DEFAULT_WEIGHT, model_name
 
 import xapian
+from functools import reduce
 
 class Field(object):
-    raw_types = (int, long, float, basestring, bool, models.Model,
+    raw_types = (int, int, float, str, bool, models.Model,
                  datetime.time, datetime.date, datetime.datetime)
 
     def __init__(self, path, model, weight=DEFAULT_WEIGHT, prefix='', number=None):
@@ -66,7 +67,7 @@ class Field(object):
         for bit in bits:
             if is_iterable(value):
                 value = ', '.join(
-                    map(lambda v: smart_str(self.resolve_one(v, bit)), value)
+                    [smart_str(self.resolve_one(v, bit)) for v in value]
                 )
             else:
                 value = self.resolve_one(value, bit)
@@ -99,7 +100,7 @@ class Field(object):
             return field_value
 
     def _is_float_or_interger(self, content_type):
-        return isinstance(content_type, (models.IntegerField, models.FloatField, int, long, float,))
+        return isinstance(content_type, (models.IntegerField, models.FloatField, int, float))
 
 class Indexer(object):
     field_class = Field
@@ -120,7 +121,7 @@ class Indexer(object):
         (object,),
         dict([
             (name[5:], value)\
-                for name, value in xapian.QueryParser.__dict__.iteritems()\
+                for name, value in xapian.QueryParser.__dict__.items()\
                     if name.startswith('FLAG_')
         ])
     )
@@ -155,7 +156,7 @@ class Indexer(object):
             self.tags.append(self.field_class(path, self._model, weight, prefix=tag, number=valueno))
             valueno += 1
 
-        for tag, aliases in self.__class__.aliases.iteritems():
+        for tag, aliases in self.__class__.aliases.items():
             if self.has_tag(tag):
                 if not isinstance(aliases, (list, tuple)):
                     aliases = (aliases,)

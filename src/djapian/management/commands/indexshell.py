@@ -6,11 +6,12 @@ from django.utils.text import smart_split
 
 from djapian import utils
 from djapian import IndexSpace
+from functools import reduce
 
 def with_index(func):
     def _decorator(cmd, arg):
         if cmd._current_index is None:
-            print "No index selected"
+            print("No index selected")
             return
 
         return func(cmd, arg)
@@ -41,7 +42,7 @@ class Interpreter(cmd.Cmd):
         """
         Lists all available indexes with their ids
         """
-        print "Installed spaces/models/indexers:"
+        print("Installed spaces/models/indexers:")
 
         def _is_selected(space, model=None, index=None):
             selected = [b for b in (space, model, index) if b is not None]
@@ -50,14 +51,14 @@ class Interpreter(cmd.Cmd):
             ) == len(selected)
 
         for space_i, space in enumerate(IndexSpace.instances):
-            print (_is_selected(space_i) and '* ' or '- ') + '%s: `%s`' % (space_i, space)
+            print((_is_selected(space_i) and '* ' or '- ') + '%s: `%s`' % (space_i, space))
             for model_indexer_i, pair in enumerate(space.get_indexers().items()):
                 model, indexers = pair
-                print (_is_selected(space_i, model_indexer_i) and '  * ' or '  - ') +\
-                        "%s.%s: `%s`" % (space_i, model_indexer_i, utils.model_name(model))
+                print((_is_selected(space_i, model_indexer_i) and '  * ' or '  - ') +\
+                        "%s.%s: `%s`" % (space_i, model_indexer_i, utils.model_name(model)))
                 for indexer_i, indexer in enumerate(indexers):
-                    print (_is_selected(space_i, model_indexer_i, indexer_i) and '    * ' or '    - ') +\
-                        "%s.%s.%s: `%s`" % (space_i, model_indexer_i, indexer_i, indexer)
+                    print((_is_selected(space_i, model_indexer_i, indexer_i) and '    * ' or '    - ') +\
+                        "%s.%s.%s: `%s`" % (space_i, model_indexer_i, indexer_i, indexer))
 
     def do_exit(self, arg):
         """
@@ -75,7 +76,7 @@ class Interpreter(cmd.Cmd):
             self._current_index = indexer
             self._current_index_path = path
 
-            print "Using `%s:%s:%s` index." % (space, utils.model_name(model), indexer)
+            print("Using `%s:%s:%s` index." % (space, utils.model_name(model), indexer))
 
     def do_usecomposite(self, indexes):
         """
@@ -89,11 +90,11 @@ class Interpreter(cmd.Cmd):
 
         self._current_index = CompositeIndexer(*[i[2] for i in indexers])
 
-        print "Using composition of:"
+        print("Using composition of:")
         for indexer in indexers:
             space, model, indexer = indexer
-            print "  `%s:%s:%s`" % (space, utils.model_name(model), indexer)
-        print "indexes."
+            print("  `%s:%s:%s`" % (space, utils.model_name(model), indexer))
+        print("indexes.")
 
     @with_index
     @split_arg
@@ -104,35 +105,35 @@ class Interpreter(cmd.Cmd):
         try:
             _slice = self._parse_slice(_slice)
         except ValueError:
-            print 'Error: second argument must be slice'
+            print('Error: second argument must be slice')
             return
 
-        print list(self._current_index.search(query)[_slice])
+        print(list(self._current_index.search(query)[_slice]))
 
     @with_index
     def do_count(self, query):
         """
         Returns count of objects fetched by given query
         """
-        print self._current_index.search(query).count()
+        print(self._current_index.search(query).count())
 
     @with_index
     def do_total(self, arg):
         """
         Returns count of objects in index
         """
-        print self._current_index.document_count()
+        print(self._current_index.document_count())
 
     def do_stats(self, arg):
         """
         Print index status information
         """
         import operator
-        print "Number of spaces: %s" % len(IndexSpace.instances)
-        print "Number of indexes: %s" % reduce(
+        print("Number of spaces: %s" % len(IndexSpace.instances))
+        print("Number of indexes: %s" % reduce(
             operator.add,
             [len(space.get_indexers()) for space in IndexSpace.instances]
-        )
+        ))
 
     @with_index
     def do_docslist(self, slice=""):
@@ -145,20 +146,20 @@ class Interpreter(cmd.Cmd):
 
         for i in range(_slice.start, _slice.stop + 1):
             doc = db.get_document(i)
-            print "doc #%s:\n\tValues (%s):" % (i, doc.values_count())
+            print("doc #%s:\n\tValues (%s):" % (i, doc.values_count()))
             val = doc.values_begin()
 
             for i in range(doc.values_count()):
-                print "\t\t%s: %s" % (val.get_valueno(), val.get_value())
-                val.next()
+                print("\t\t%s: %s" % (val.get_valueno(), val.get_value()))
+                next(val)
 
-            print "\tTerms (%s):" % doc.termlist_count()
+            print("\tTerms (%s):" % doc.termlist_count())
             termlist = doc.termlist_begin()
 
             for i in range(doc.termlist_count()):
-                print termlist.get_term(),
-                termlist.next()
-            print "\n"
+                print(termlist.get_term(), end=' ')
+                next(termlist)
+            print("\n")
 
     @with_index
     def do_delete(self, id):
@@ -169,23 +170,23 @@ class Interpreter(cmd.Cmd):
 
         db = self._current_index._db.open(write=True)
         db.delete_document(id)
-        print "Document #%s deleted." % id
+        print("Document #%s deleted." % id)
 
     def _get_indexer(self, index):
         try:
-            _space, _model, _indexer = map(int, index.split('.'))
+            _space, _model, _indexer = list(map(int, index.split('.')))
 
             space = IndexSpace.instances[_space]
-            model = space.get_indexers().keys()[_model]
+            model = list(space.get_indexers().keys())[_model]
             indexer = space.get_indexers()[model][_indexer]
         except (TypeError, IndexError, KeyError, ValueError):
-            print 'Error: illegal index alias `%s`. See `list` command for available aliases' % index
+            print('Error: illegal index alias `%s`. See `list` command for available aliases' % index)
             return None, None, None, None
 
         return space, model, indexer, [_space, _model, _indexer]
 
     def _parse_slice(self, _slice, delimeter=':', default=None):
-        bits = map(int, [b for b in _slice.split(delimeter, 2) if b]) or default
+        bits = list(map(int, [b for b in _slice.split(delimeter, 2) if b])) or default
         if not bits:
             return slice(None)
         elif len(bits) == 1:
@@ -207,4 +208,4 @@ class Command(BaseCommand):
         try:
             Interpreter(*args).cmdloop("Interactive Djapian shell.")
         except KeyboardInterrupt:
-            print "\n"
+            print("\n")

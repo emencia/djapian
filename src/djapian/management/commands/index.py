@@ -16,6 +16,7 @@ from djapian import utils
 from djapian.utils.paging import paginate
 from djapian.utils.commiter import Commiter
 from djapian import IndexSpace
+from functools import reduce
 
 def get_content_types(app_models, *actions):
     lookup_args = dict(action__in=actions)
@@ -57,7 +58,7 @@ def update_changes(verbose, timeout, once, per_page, commit_each, app_models=Non
     while True:
         count = Change.objects.count()
         if count > 0 and verbose:
-            print 'There are %d objects to update' % count
+            print('There are %d objects to update' % count)
 
         for ct in get_content_types(app_models, 'add', 'edit'):
             indexers = get_indexers(ct)
@@ -129,7 +130,7 @@ def rebuild(verbose, per_page, commit_each, app_models=None):
             sys.stdout.flush()
 
     for space in IndexSpace.instances:
-        for model, indexers in space.get_indexers().iteritems():
+        for model, indexers in space.get_indexers().items():
             if app_models is None or model in app_models:
                 for indexer in indexers:
                     indexer.clear()
@@ -182,7 +183,7 @@ class Command(BaseCommand):
         if app_labels:
             try:
                 app_list = [models.get_app(app_label) for app_label in app_labels]
-            except (ImproperlyConfigured, ImportError), e:
+            except (ImproperlyConfigured, ImportError) as e:
                 raise CommandError("%s. Are you sure your INSTALLED_APPS setting is correct?" % e)
             for app in app_list:
                 app_models = models.get_models(app, include_auto_created=True)
@@ -201,4 +202,4 @@ class Command(BaseCommand):
                                per_page, commit_each)
 
         if verbose:
-            print '\n'
+            print('\n')
