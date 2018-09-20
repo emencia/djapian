@@ -1,6 +1,6 @@
 import collections
 import os
-import new
+import types
 
 from django.db import models
 
@@ -72,7 +72,7 @@ class IndexSpace(object):
             else:
                 tags.append((field.name, field.attname))
 
-        return new.classobj(
+        return types.new_class(
             "Default%sIndexer" % utils.model_name(model).replace('.', ''),
             (Indexer,),
             {
