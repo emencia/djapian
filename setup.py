@@ -18,7 +18,8 @@ setup(
         "djapian.utils",
         "djapian.tests",
         "djapian.management",
-        "djapian.management.commands"
+        "djapian.management.commands",
+        "djapian.migrations",
     ],
     package_dir={
         "djapian": "src/djapian"
