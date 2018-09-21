@@ -16,7 +16,7 @@ import xapian
 from functools import reduce
 
 class Field(object):
-    raw_types = (int, int, float, str, bool, models.Model,
+    raw_types = (int, float, str, bool, models.Model,
                  datetime.time, datetime.date, datetime.datetime)
 
     def __init__(self, path, model, weight=DEFAULT_WEIGHT, prefix='', number=None):
@@ -168,11 +168,8 @@ class Indexer(object):
         models.signals.post_save.connect(post_save, sender=self._model)
         models.signals.pre_delete.connect(pre_delete, sender=self._model)
 
-    def __unicode__(self):
-        return self.__class__.get_descriptor()
-
     def __str__(self):
-        return smart_str(self.__unicode__())
+        return self.__class__.get_descriptor()
 
     def has_tag(self, name):
         return self.tag_index(name) is not None

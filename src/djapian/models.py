@@ -50,7 +50,7 @@ class Change(models.Model):
 
     objects = ChangeManager()
 
-    def __unicode__(self):
+    def __str__(self):
         return '%s %s#%s on %s' % (
             self.action,
             self.content_type,

@@ -11,7 +11,7 @@ class Person(models.Model):
     name = models.CharField(max_length=150)
     age = models.PositiveIntegerField(default=0)
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
     class Meta:
@@ -35,7 +35,7 @@ class Entry(models.Model):
     def headline(self):
         return "%s - %s" % (self.author, self.title)
 
-    def __unicode__(self):
+    def __str__(self):
         return self.title
 
     class Meta:
@@ -143,7 +143,7 @@ class WeightenedEntry(models.Model):
     num_payments = models.PositiveIntegerField(default=0)
     is_active = models.BooleanField(default=True)
 
-    def __unicode__(self):
+    def __str__(self):
         return self.title
 
     def get_weight_int(self):

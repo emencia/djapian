@@ -5,7 +5,7 @@ from functools import reduce
 
 
 from django.apps import apps
-from django.utils.encoding import force_unicode
+from django.utils.encoding import force_text
 
 from djapian import utils, decider
 from djapian.utils.decorators import retry_if_except
@@ -291,8 +291,8 @@ class ResultSet(object):
             else:
                 return next(iter(self._clone(offset=k, limit=1)))
 
-    def __unicode__(self):
-        return "<ResultSet: query=%s>" % force_unicode(self._query_str)
+    def __str__(self):
+        return "<ResultSet: query=%s>" % force_text(self._query_str)
 
 class Hit(object):
     def __init__(self, pk, model, percent, rank, weight, tags, collapse_count, collapse_key):

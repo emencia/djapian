@@ -18,12 +18,8 @@ class IndexSpace(object):
 
         self.__class__.instances.append(self)
 
-    def __unicode__(self):
-        return self._name
-
     def __str__(self):
-        from django.utils.encoding import smart_str
-        return smart_str(self.__unicode__())
+        return self._name
 
     def add_index(self, model, indexer=None, attach_as=None):
         if indexer is None:

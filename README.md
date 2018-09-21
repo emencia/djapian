@@ -41,7 +41,7 @@ Assume that we have this models in our imaginary application:
 class Person(models.Model):
     name = models.CharField(max_length=150)
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
 class Entry(models.Model):
@@ -58,7 +58,7 @@ class Entry(models.Model):
     def headline(self):
         return "%s - %s" % (self.author, self.title)
 
-    def __unicode__(self):
+    def __str__(self):
         return self.title
 ```
 And we want to apply indexing functionality for model `Entry`. The next step is to create `Indexer` instance with proper settings. Indexer may look like this:

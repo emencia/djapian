@@ -3,7 +3,7 @@ import os
 from djapian import Field
 from djapian.tests.utils import BaseTestCase, BaseIndexerTest, Entry, Person
 from djapian.models import Change
-from django.utils.encoding import force_unicode
+from django.utils.encoding import force_text
 
 class IndexerTest(BaseTestCase):
     def test_fields_count(self):
@@ -27,13 +27,13 @@ class FieldResolverTest(BaseTestCase):
         self.assertEqual(Field("author.name", Entry).resolve(self.entry), "Alex")
 
     def test_fk_attribute(self):
-        self.assertEqual(force_unicode(Field("author", Entry).resolve(self.entry)), "Alex")
+        self.assertEqual(force_text(Field("author", Entry).resolve(self.entry)), "Alex")
 
     def test_m2m_attribute(self):
-        self.assertEqual(force_unicode(Field("editors", Entry).resolve(self.entry)), "Alex, Sam")
+        self.assertEqual(force_text(Field("editors", Entry).resolve(self.entry)), "Alex, Sam")
 
     def test_m2m_field_attribute(self):
-        self.assertEqual(force_unicode(Field("editors.age", Entry).resolve(self.entry)), "22, 25")
+        self.assertEqual(force_text(Field("editors.age", Entry).resolve(self.entry)), "22, 25")
 
     def test_method(self):
         self.assertEqual(
