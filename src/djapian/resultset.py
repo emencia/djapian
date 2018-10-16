@@ -228,7 +228,7 @@ class ResultSet(object):
             doc = match.document
 
             model = doc.get_value(2)
-            model = apps.get_model(*model.split('.'))
+            model = apps.get_model(*model.decode().split('.'))
             pk = model._meta.pk.to_python(doc.get_value(1))
 
             percent = match.percent
