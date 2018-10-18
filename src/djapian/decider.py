@@ -95,6 +95,15 @@ class CompositeDecider(xapian.MatchDecider):
 
         doc_value = document.get_value(self._values_map[field])
 
+        """
+        Usually document returns string value as bytes 
+        but for python 3 we want to convert it to string
+        """
+        try:
+            doc_value = doc_value.decode()
+        except AttributeError:
+            pass
+
         convert = self.get_tag(self._values_map[field]).convert
 
         if isinstance(value, (list, tuple)):
