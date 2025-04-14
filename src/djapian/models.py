@@ -40,7 +40,7 @@ class Change(models.Model):
         ("delete", "object deleted"),
     )
 
-    content_type = models.ForeignKey(ContentType, db_index=True)
+    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE, db_index=True)
     object_id = models.CharField(max_length=150)
 
     date = models.DateTimeField(default=datetime.now)
