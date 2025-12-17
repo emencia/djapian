@@ -4,7 +4,6 @@ import re
 import xapian
 
 from django.db import models
-from django.utils.functional import curry
 from functools import reduce
 
 class X(models.Q):
