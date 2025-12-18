@@ -6,6 +6,7 @@ from django.conf import settings
 from django.utils.encoding import smart_str
 
 from djapian import decider
+from django.core.exceptions import FieldDoesNotExist
 from djapian.database import CompositeDatabase
 from djapian.utils.paging import paginate
 from djapian.utils.commiter import Commiter
@@ -96,7 +97,7 @@ class Field(object):
         """Returns field's models.Field instance or value if such model field does not exist"""
         try:
             return self.model._meta.get_field(self.path.split('.', 1)[0])
-        except models.FieldDoesNotExist:
+        except FieldDoesNotExist:
             return field_value
 
     def _is_float_or_interger(self, content_type):
@@ -298,7 +299,7 @@ class Indexer(object):
             if database is None:
                 database = self._db.open(write=True)
             database.delete_document(self._create_uid(obj))
-        except (IOError, RuntimeError, xapian.DocNotFoundError) as e:
+        except (IOError, RuntimeError, xapian.DocNotFoundError):
             pass
 
     def document_count(self):
